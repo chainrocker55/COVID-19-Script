@@ -38,8 +38,15 @@ var lineClient = new LineBotSDK.Client({
       return replyMessageNewUser(token, replyText);
     }
   
+    var userId = requestObj.source.userId;
     var userMessage = requestObj.message.text;
-    //Logger.log(userMessage);
+    var userName = getUserName(userId);
+    var userLog = {
+      "userId":userId,
+      "name":userName,
+      "message":userMessage
+    }
+    Logger.log(JSON.stringify(userLog));
     //var replyText = JSON.stringify(requestObj);
     if(userMessage.includes("ทั้งหมด") || userMessage.includes("ล่าสุด") || userMessage.includes("รายวัน") || userMessage.includes("ยอดรวม") ){
       var replyTextFromSheet = getCovidSheet();
@@ -47,6 +54,23 @@ var lineClient = new LineBotSDK.Client({
     }
     var replyText = getByProvince(userMessage)
     return replyMessage(token, replyText);
+  }
+  function getUserName(userId) {
+    var url = "https://api.line.me/v2/bot/profile/" + userId;
+    var lineHeader = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer [Your token channel access token.]"
+    };
+    
+    var options = {
+      "method" : "GET",
+      "headers" : lineHeader
+    };
+    
+    var responseJson = UrlFetchApp.fetch(url, options);
+    var displayName = JSON.parse(responseJson).displayName;
+    
+    return displayName;
   }
   
   function getUserProfiles(userId) {
@@ -212,7 +236,7 @@ var lineClient = new LineBotSDK.Client({
     +"\nติดเชื้อสะสม : "+data['Confirmed']+" ราย"+" \nติดเชื้อเพิ่มขึ้น : "+ data['NewConfirmed']+" ราย"
     +"\nเสียชีวิตสะสม : "+data['Deaths']+" ราย"+" \nเสียชีวิตเพิ่มขึ้น : "+ data['NewDeaths']+" ราย"
     +"\nรักษาตัวในรพ.ตอนนี้ : "+data['Hospitalized']+" ราย"+" \nรักษาตัวในรพ.เพิ่มขึ้น : "+ data['NewHospitalized']+" ราย"
-    +"\nหายแล้วตอนนี้ : "+data['Recovered']+" ราย"+" \nหายแล้วเพิ่มขึ้น : "+ data['NewHospitalized']+" ราย"
+    +"\nหายแล้วตอนนี้ : "+data['Recovered']+" ราย"+" \nหายแล้วเพิ่มขึ้น : "+ data['NewRecovered']+" ราย"
     ;
       
     var lastRow = sheetData.getLastRow();
