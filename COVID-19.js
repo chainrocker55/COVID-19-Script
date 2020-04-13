@@ -289,3 +289,11 @@ var lineClient = new LineBotSDK.Client({
     data = data['Province']
     return data
   }
+  function checkDate(chDate){
+    var today = new Date();
+    var d = today.getDate().toString();
+    var m = (today.getMonth()+1).toString();
+    var y = today.getFullYear().toString();
+    var date = d.padStart(2,'0')+'\/'+m.padStart(2,'0')+'\/'+y.padStart(2,'0');
+    return chDate===date;
+  }
